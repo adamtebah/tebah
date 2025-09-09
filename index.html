@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아동보호체계</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page, scrolling dashboard structure was chosen to guide the user through a narrative flow, from general concepts to specific data. It starts with a high-level comparison of all three care types, presents national data, then allows a deep-dive into detailed Seoul statistics, followed by data on youth aging out of care. The structure concludes with qualitative benefits, making the information digestible. -->
+    <!-- Visualization & Content Choices: 
+        - National Data: Goal: Compare key metrics for each care type. Viz: Grouped Bar Chart (Chart.js) with a single y-axis to accurately represent scale differences. Interaction: Tooltips on hover, direct data labels. Justification: A single-axis chart prevents misinterpretation of data with vastly different scales.
+        - Seoul School Level: Goal: Show age distribution. Viz: Donut Chart (Chart.js). Interaction: Tooltips on hover, direct percentage labels.
+        - Seoul Admission Reasons & Needs: Goal: Highlight key challenges. Viz: Horizontal Bar Charts (Chart.js). Interaction: Tooltips on hover, direct data labels.
+        - Self-Reliance Youth: Goal: Show origin of youth aging out of care. Viz: Pie Chart (Chart.js). Interaction: Tooltips on hover, direct percentage labels. Justification: Pie chart is effective for showing the composition of a whole.
+        - Overall: All statistical tables were converted into dynamic charts to improve comprehension and engagement.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF8;
+            color: #383838;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover {
+            color: #D97706;
+        }
+        .active-nav {
+            color: #D97706;
+            font-weight: 700;
+            border-bottom: 2px solid #D97706;
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .active-tab {
+            background-color: #C2410C;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF8]">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#C2410C]">아동보호체계</h1>
+            <div class="hidden md:flex space-x-8 text-sm">
+                <a href="#intro" class="nav-link pb-1 border-b-2 border-transparent">소개</a>
+                <a href="#national" class="nav-link pb-1 border-b-2 border-transparent">전국 현황</a>
+                <a href="#features" class="nav-link pb-1 border-b-2 border-transparent">아동그룹홈 특징</a>
+                <a href="#seoul" class="nav-link pb-1 border-b-2 border-transparent">서울시 아동그룹홈</a>
+                <a href="#self-reliance" class="nav-link pb-1 border-b-2 border-transparent">자립준비청년</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="intro" class="text-center py-16">
+            <h2 class="text-4xl font-bold mb-4 text-[#383838]">모든 아동청소년은 가정이 필요합니다</h2>
+             <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12">
+                아동양육시설, 아동그룹홈, 그리고 가정위탁 체계를 통해 <strong class="text-orange-600">0세부터 만 24세까지</strong> 다양한 이유로 보호가 필요한 아동을 보호하고, 건강한 사회구성원으로 자립할 수 있도록 지원합니다.
+            </p>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C2410C]">아동양육시설</h3>
+                    <p class="text-gray-600">수십 명 이상의 아동이 생활하는 대규모 시설입니다. 단체 생활을 통해 사회성을 기를 수 있습니다.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C2410C]">아동그룹홈</h3>
+                    <p class="text-gray-600">7인 이하 소규모 아동이 가정과 같은 환경에서 생활하며 안정적인 애착을 형성합니다.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C2410C]">가정위탁</h3>
+                    <p class="text-gray-600">위탁 부모의 가정에서 아동을 양육하는 방식으로, 가장 가정적인 환경을 제공합니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="national" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">전국 보호아동 및 시설 현황 (2022년 기준)</h2>
+                <p class="text-gray-600">각 보호 형태별 아동 수와 시설 수 비교</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="chart-container">
+                    <canvas id="nationalStatusChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 bg-orange-50/50 rounded-xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">아동그룹홈, 무엇이 다른가요?</h2>
+                <p class="text-gray-600">아동그룹홈은 '시설'을 넘어 '가정'의 역할을 목표로 합니다.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="text-center p-6">
+                    <div class="flex items-center justify-center h-20 w-20 mx-auto mb-4 bg-orange-100 text-orange-600 rounded-full text-3xl">👨‍👩‍👧‍👦</div>
+                    <h3 class="text-xl font-bold mb-2">안정적인 애착 형성</h3>
+                    <p class="text-gray-600">소수의 아동이 양육자와 부모-자녀와 같은 관계를 맺으며 정서적 안정감을 얻고 건강한 애착을 형성합니다.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="flex items-center justify-center h-20 w-20 mx-auto mb-4 bg-orange-100 text-orange-600 rounded-full text-3xl">🏠</div>
+                    <h3 class="text-xl font-bold mb-2">가정과 같은 환경</h3>
+                    <p class="text-gray-600">함께 장을 보고 식사를 준비하는 등 평범한 일상을 경험하며 자립에 필요한 기술과 책임감을 배웁니다.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="flex items-center justify-center h-20 w-20 mx-auto mb-4 bg-orange-100 text-orange-600 rounded-full text-3xl">🏫</div>
+                    <h3 class="text-xl font-bold mb-2">지역사회와의 유대</h3>
+                    <p class="text-gray-600">지역 내 학교, 학원에 다니고 친구들과 어울리며 시설이 아닌 지역사회에 뿌리내린 삶을 살아갑니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="seoul" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">서울시 아동그룹홈 (2024년 말 기준)</h2>
+                <p class="text-gray-600">서울시 아동그룹홈의 운영 현황과 보호 아동들의 특성</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="mb-6 flex justify-center border-b border-gray-200">
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold active-tab" onclick="changeTab(event, 'seoul-overview', 'seoul-tabs')">아동 현황</button>
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold" onclick="changeTab(event, 'seoul-reasons', 'seoul-tabs')">입소 사유</button>
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold" onclick="changeTab(event, 'seoul-needs', 'seoul-tabs')">심리·정서 특성</button>
+                </div>
+
+                <div id="seoul-overview" class="seoul-tabs tab-content">
+                    <div class="grid md:grid-cols-3 gap-4 text-center mb-8">
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <p class="text-sm text-orange-700 font-semibold">총 시설 수</p>
+                            <p class="text-3xl font-bold text-orange-900">66<span class="text-lg ml-1">개소</span></p>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <p class="text-sm text-orange-700 font-semibold">총 아동 수</p>
+                            <p class="text-3xl font-bold text-orange-900">307<span class="text-lg ml-1">명</span></p>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <p class="text-sm text-orange-700 font-semibold">총 종사자 수</p>
+                            <p class="text-3xl font-bold text-orange-900">232<span class="text-lg ml-1">명</span></p>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-600 mb-4">학년별 아동 분포</p>
+                    <div class="chart-container h-64 md:h-80 max-h-[35vh]">
+                        <canvas id="seoulChildrenChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="seoul-reasons" class="seoul-tabs tab-content hidden">
+                    <p class="text-center text-gray-600 mb-4">주요 입소 사유 (최초 입소 기준)</p>
+                    <div class="chart-container">
+                        <canvas id="seoulReasonsChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="seoul-needs" class="seoul-tabs tab-content hidden">
+                    <p class="text-center text-gray-600 mb-4">심리·정서 등 특성별 현황 (중복 포함)</p>
+                    <div class="chart-container">
+                        <canvas id="seoulNeedsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="self-reliance" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">자립준비청년 심층 분석 (2023년 실태조사)</h2>
+                <p class="text-gray-600">보호종료 후 5년 이내 자립준비청년의 다양한 삶의 지표</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="mb-6 flex justify-center border-b border-gray-200">
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold active-tab" onclick="changeTab(event, 'sr-wellbeing', 'sr-tabs')">삶의 만족도</button>
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold" onclick="changeTab(event, 'sr-economy', 'sr-tabs')">경제·주거</button>
+                    <button class="tab-button text-sm md:text-base py-3 px-4 md:px-6 font-semibold" onclick="changeTab(event, 'sr-social', 'sr-tabs')">교육·사회관계</button>
+                </div>
+
+                <div id="sr-wellbeing" class="sr-tabs tab-content">
+                    <p class="text-center text-gray-600 mb-4">주관적 자립 상태 평가 (10점 만점)</p>
+                     <div class="chart-container">
+                        <canvas id="selfRelianceStatusChart"></canvas>
+                    </div>
+                     <p class="text-center text-gray-600 mt-8 mb-4">자살을 생각한 주된 이유 (2023년)</p>
+                     <div class="chart-container">
+                        <canvas id="suicideReasonsChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="sr-economy" class="sr-tabs tab-content hidden">
+                    <p class="text-center text-gray-600 mb-4">보호종료 후 가장 큰 어려움</p>
+                    <div class="chart-container">
+                        <canvas id="biggestDifficultiesChart"></canvas>
+                    </div>
+                     <p class="text-center text-gray-600 mt-8 mb-4">가장 필요한 자립지원</p>
+                     <div class="chart-container">
+                        <canvas id="neededSupportChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="sr-social" class="sr-tabs tab-content hidden">
+                    <p class="text-center text-gray-600 mb-4">대학 진학 상태 (2023년)</p>
+                     <div class="chart-container h-64 md:h-80 max-h-[35vh]">
+                        <canvas id="educationStatusChart"></canvas>
+                    </div>
+                    <p class="text-center text-gray-600 mt-8 mb-4">도움이 필요할 때 요청할 수 있는 사람</p>
+                    <div class="chart-container">
+                        <canvas id="supportSystemChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-gray-200">
+        <p class="text-gray-500">모든 아이들은 사랑받으며 자랄 권리가 있습니다.</p>
+    </footer>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const chartColors = {
+            orange: 'rgba(234, 88, 12, 0.8)',
+            orangeLight: 'rgba(251, 146, 60, 0.8)',
+            amber: 'rgba(245, 158, 11, 0.8)',
+            amberLight: 'rgba(251, 191, 36, 0.8)',
+            teal: 'rgba(20, 184, 166, 0.8)',
+            tealLight: 'rgba(45, 212, 191, 0.8)',
+            cyan: 'rgba(6, 182, 212, 0.8)',
+            gray: 'rgba(107, 114, 128, 0.7)',
+            grayLight: 'rgba(156, 163, 175, 0.7)'
+        };
+
+        const nationalData = {
+            labels: ['아동양육시설', '아동그룹홈', '가정위탁'],
+            datasets: [
+                {
+                    label: '보호 아동 수 (명)',
+                    data: [9335, 2431, 2650],
+                    backgroundColor: chartColors.orangeLight,
+                    borderColor: chartColors.orange,
+                    borderWidth: 1,
+                },
+                {
+                    label: '시설 수 (개소)',
+                    data: [223, 522, 0],
+                    backgroundColor: chartColors.tealLight,
+                    borderColor: chartColors.teal,
+                    borderWidth: 1,
+                }
+            ]
+        };
+
+        const seoulChildrenData = {
+            labels: ['미취학', '초등', '중등', '고등 이상'],
+            datasets: [{
+                label: '아동 수',
+                data: [37, 98, 71, 101],
+                backgroundColor: [
+                    chartColors.orangeLight,
+                    chartColors.amberLight,
+                    chartColors.amber,
+                    chartColors.orange
+                ],
+                borderColor: '#FDFBF8',
+                borderWidth: 2
+            }]
+        };
+
+        const seoulReasonsData = {
+            labels: ['아동학대', '양육곤란', '기아', '기타', '보호처분'],
+            datasets: [{
+                label: '아동 수 (명)',
+                data: [134, 132, 20, 20, 1],
+                backgroundColor: chartColors.orangeLight,
+                borderColor: chartColors.orange,
+                borderWidth: 1
+            }]
+        };
+
+        const seoulNeedsData = {
+            labels: ['ADHD', '경계선지능', '발달장애', '기타 정신질환', '기타장애'],
+            datasets: [{
+                label: '아동 수 (명)',
+                data: [75, 64, 21, 19, 8],
+                backgroundColor: chartColors.amberLight,
+                borderColor: chartColors.amber,
+                borderWidth: 1
+            }]
+        };
+        
+        const selfRelianceStatusData = {
+            labels: ['경제적 자립', '심리정서적 자립', '사회적 자립'],
+            datasets: [
+                {
+                    label: '2020년',
+                    data: [5.1, 5.7, 5.7],
+                    backgroundColor: chartColors.grayLight,
+                    borderColor: chartColors.gray,
+                    borderWidth: 1
+                },
+                {
+                    label: '2023년',
+                    data: [6.1, 6.5, 6.6],
+                    backgroundColor: chartColors.tealLight,
+                    borderColor: chartColors.teal,
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        const suicideReasonsData = {
+            labels: ['정신과적 문제', '경제적 문제', '가정생활 문제', '학업·취업 문제'],
+            datasets: [{
+                label: '응답 비율 (%)',
+                data: [30.7, 28.7, 12.3, 7.3],
+                backgroundColor: chartColors.orangeLight,
+                borderColor: chartColors.orange,
+                borderWidth: 1
+            }]
+        };
+
+        const biggestDifficultiesData = {
+            labels: ['거주할 집 문제', '필요한 돈 부족', '취업 정보 등 부족', '돈 관리에 대한 지식 부족', '외로움, 심리적 부담'],
+            datasets: [{
+                label: '응답 비율 (%)',
+                data: [26.9, 23.2, 17.9, 7.2, 6.2],
+                backgroundColor: chartColors.amberLight,
+                borderColor: chartColors.amber,
+                borderWidth: 1
+            }]
+        };
+
+        const neededSupportData = {
+            labels: ['경제적 지원', '주거 지원', '진로상담·취업 지원', '건강 지원'],
+            datasets: [{
+                label: '응답 비율 (%)',
+                data: [68.2, 20.2, 3.4, 2.5],
+                backgroundColor: chartColors.tealLight,
+                borderColor: chartColors.teal,
+                borderWidth: 1
+            }]
+        };
+        
+        const educationStatusData = {
+            labels: ['4년제 대학원', '2·3년제', '고졸 이하'],
+            datasets: [{
+                data: [35.4, 34.3, 30.3],
+                 backgroundColor: [
+                    chartColors.orange,
+                    chartColors.teal,
+                    chartColors.grayLight
+                ],
+                borderColor: '#FDFBF8',
+                borderWidth: 2
+            }]
+        };
+        
+        const supportSystemData = {
+             labels: ['학교·동네친구', '형제·자매', '시설 선생님·위탁 부모님', '친척'],
+            datasets: [{
+                label: '응답 비율 (%)',
+                data: [59.0, 28.3, 26.4, 23.8],
+                backgroundColor: chartColors.amberLight,
+                borderColor: chartColors.amber,
+                borderWidth: 1
+            }]
+        };
+
+        const barChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value > 0 ? value.toLocaleString() : '',
+                    font: { weight: 'bold' },
+                    color: '#4A5568'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value.toLocaleString()
+                    }
+                }
+            }
+        };
+        
+        const horizontalChartOptions = {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    enabled: true
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    formatter: (value) => value.toLocaleString() + '%',
+                    font: { weight: 'bold' },
+                    color: '#4A5568',
+                    padding: { left: 6 }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value.toLocaleString() + '%'
+                    }
+                }
+            }
+        };
+
+        const pieDonutOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    enabled: true
+                },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        const percentage = (value * 100 / sum).toFixed(1) + '%';
+                        return percentage;
+                    },
+                    color: '#fff',
+                    font: { weight: 'bold', size: 14 }
+                }
+            }
+        };
+        
+        const datalabelFormatter = (value, ctx) => {
+            const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            const percentage = (value * 100 / sum).toFixed(1) + '%';
+            return percentage;
+        };
+
+
+        window.onload = function() {
+            new Chart(document.getElementById('nationalStatusChart').getContext('2d'), { type: 'bar', data: nationalData, options: barChartOptions });
+            new Chart(document.getElementById('seoulChildrenChart').getContext('2d'), { type: 'doughnut', data: seoulChildrenData, options: pieDonutOptions });
+            new Chart(document.getElementById('seoulReasonsChart').getContext('2d'), { type: 'bar', data: seoulReasonsData, options: {...horizontalChartOptions, plugins: {...horizontalChartOptions.plugins, datalabels: {...horizontalChartOptions.plugins.datalabels, formatter: (v) => v.toLocaleString()+'명'}}, scales: {x:{beginAtZero:true, ticks: {callback: (v) => v.toLocaleString()+'명'}}}} });
+            new Chart(document.getElementById('seoulNeedsChart').getContext('2d'), { type: 'bar', data: seoulNeedsData, options: {...horizontalChartOptions, plugins: {...horizontalChartOptions.plugins, datalabels: {...horizontalChartOptions.plugins.datalabels, formatter: (v) => v.toLocaleString()+'명'}}, scales: {x:{beginAtZero:true, ticks: {callback: (v) => v.toLocaleString()+'명'}}}} });
+            
+            new Chart(document.getElementById('selfRelianceStatusChart').getContext('2d'), { type: 'bar', data: selfRelianceStatusData, options: {...barChartOptions, scales: { y: { ...barChartOptions.scales.y, max: 10, title: {display:true, text:'점'}}}} });
+            new Chart(document.getElementById('suicideReasonsChart').getContext('2d'), { type: 'bar', data: suicideReasonsData, options: horizontalChartOptions });
+            new Chart(document.getElementById('biggestDifficultiesChart').getContext('2d'), { type: 'bar', data: biggestDifficultiesData, options: horizontalChartOptions });
+            new Chart(document.getElementById('neededSupportChart').getContext('2d'), { type: 'bar', data: neededSupportData, options: horizontalChartOptions });
+            new Chart(document.getElementById('educationStatusChart').getContext('2d'), { type: 'doughnut', data: educationStatusData, options: {...pieDonutOptions, plugins: {...pieDonutOptions.plugins, datalabels: {...pieDonutOptions.plugins.datalabels, formatter: datalabelFormatter }}} });
+            new Chart(document.getElementById('supportSystemChart').getContext('2d'), { type: 'bar', data: supportSystemData, options: horizontalChartOptions });
+        };
+
+        function changeTab(event, tabID, tabContainerClass) {
+            let tabcontent = document.getElementsByClassName(tabContainerClass);
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.add("hidden");
+            }
+
+            let tablinks = event.currentTarget.parentElement.children;
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active-tab");
+            }
+
+            document.getElementById(tabID).classList.remove("hidden");
+            event.currentTarget.classList.add("active-tab");
+        }
+
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 60) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-nav');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-nav');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
